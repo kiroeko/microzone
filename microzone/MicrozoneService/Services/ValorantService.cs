@@ -8,6 +8,8 @@ namespace MicrozoneService
         private bool isValorantRunning = false;
         private const int tickIntervalMS = 1000;
 
+        public bool IsValorantRunning => isValorantRunning;
+
         public ValorantService(IConfiguration configuration)
         {
             processName = configuration["ValorantService:ProcessName"];
@@ -71,6 +73,9 @@ namespace MicrozoneService
     public static class ValorantServiceExtensions
     {
         public static IServiceCollection AddValorantService(this IServiceCollection self)
-            => self.AddHostedService<ValorantService>();
+        {
+            return self.AddSingleton<ValorantService>().
+                AddHostedService(provider => provider.GetService<ValorantService>());
+        }
     }
 }
