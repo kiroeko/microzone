@@ -14,11 +14,19 @@ namespace MicrozoneService
         }
 
         [HttpGet]
-        public ApiResult<bool> Get()
+        public ApiResult<bool> GetIsValorantRunning()
         {
             if (valorantService == null)
                 return ApiResult(false);
             return ApiResult(valorantService.IsValorantRunning);
+        }
+
+        [HttpGet("stop")]
+        public ApiResult<bool> Stop()
+        {
+            if (valorantService == null)
+                return ApiResult(false);
+            return ApiResult(valorantService.StopValorant());
         }
     }
 }
