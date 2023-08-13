@@ -22,6 +22,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddStatusService();
+builder.Services.AddValorantService();
 
 var app = builder.Build();
 
