@@ -27,7 +27,7 @@ namespace MicrozoneDaemon
         {
             this.logger = logger;
 
-            httpClient.BaseAddress = new Uri(configuration["MircrozoneCenter:BaseAddress"]);
+            httpClient.BaseAddress = new Uri(configuration["MicrozoneCenter:BaseAddress"]);
 
             statusRequest = configuration["MicrozoneCenter:StatusRequest"];
             runtimePath = configuration["MicrozoneCenter:RuntimePath"];
