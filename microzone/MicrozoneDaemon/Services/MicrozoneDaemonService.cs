@@ -2,19 +2,12 @@ using System.Diagnostics;
 
 namespace MicrozoneDaemon
 {
-    public enum MicrozoneServiceStatus
-    {
-        EXCEPTION,
-        SERVICE_OFFLINE,
-        SERVICE_ONLINE
-    }
-
-    public class MicrozoneDaemonWorker : BackgroundService, IDisposable
+    public class MicrozoneDaemonService : BackgroundService, IDisposable
     {
         private readonly string statusRequest = "";
         private readonly string runtimePath = "";
         private readonly string runtimeArguments = "";
-        private readonly ILogger<MicrozoneDaemonWorker> logger;
+        private readonly ILogger<MicrozoneDaemonService> logger;
 
         private readonly HttpClient httpClient = new HttpClient();
         private Process? microzoneServiceProcess = null;
@@ -23,7 +16,14 @@ namespace MicrozoneDaemon
         private const int tickIntervalMS = 1000;
         private const int waittingForServiceResumeMS = 10000;
 
-        public MicrozoneDaemonWorker(IConfiguration configuration, ILogger<MicrozoneDaemonWorker> logger)
+        private enum MicrozoneStatus
+        {
+            EXCEPTION,
+            SERVICE_OFFLINE,
+            SERVICE_ONLINE
+        }
+
+        public MicrozoneDaemonService(IConfiguration configuration, ILogger<MicrozoneDaemonService> logger)
         {
             this.logger = logger;
 
@@ -38,8 +38,8 @@ namespace MicrozoneDaemon
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                MicrozoneServiceStatus status = await GetServiceStatus();
-                if (status != MicrozoneServiceStatus.SERVICE_ONLINE)
+                MicrozoneStatus status = await GetServiceStatus(stoppingToken);
+                if (status != MicrozoneStatus.SERVICE_ONLINE)
                 {
                     logger.LogWarning($"Microzone service status is {status}");
                     await RebootServiceProcess(stoppingToken);
@@ -49,19 +49,19 @@ namespace MicrozoneDaemon
             }
         }
 
-        private async Task<MicrozoneServiceStatus> GetServiceStatus()
+        private async Task<MicrozoneStatus> GetServiceStatus(CancellationToken stoppingToken)
         {
             try
             {
-                HttpResponseMessage response = await httpClient.GetAsync(statusRequest);
+                HttpResponseMessage response = await httpClient.GetAsync(statusRequest, stoppingToken);
                 if (response.IsSuccessStatusCode)
-                    return MicrozoneServiceStatus.SERVICE_ONLINE;
-                return MicrozoneServiceStatus.SERVICE_OFFLINE;
+                    return MicrozoneStatus.SERVICE_ONLINE;
+                return MicrozoneStatus.SERVICE_OFFLINE;
             }
             catch (Exception ex)
             {
                 logger.LogError($"Call status api error: {ex.Message}");
-                return MicrozoneServiceStatus.EXCEPTION;
+                return MicrozoneStatus.EXCEPTION;
             }
         }
 
@@ -115,9 +115,15 @@ namespace MicrozoneDaemon
             GC.SuppressFinalize(this);
         }
 
-        ~MicrozoneDaemonWorker()
+        ~MicrozoneDaemonService()
         {
             Dispose();
         }
+    }
+
+    public static class MicrozoneDaemonServiceExtensions
+    {
+        public static IServiceCollection AddMicrozoneDaemonService(this IServiceCollection self)
+            => self.AddHostedService<MicrozoneDaemonService>();
     }
 }

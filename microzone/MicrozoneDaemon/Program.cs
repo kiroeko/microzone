@@ -12,7 +12,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         LoggerProviderOptions.RegisterProviderOptions<
             EventLogSettings, EventLogLoggerProvider>(services);
 
-        services.AddHostedService<MicrozoneDaemonWorker>();
+        services.AddMicrozoneDaemonService();
 
         services.AddLogging(builder =>
         {
