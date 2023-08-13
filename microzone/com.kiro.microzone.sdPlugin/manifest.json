@@ -1,0 +1,36 @@
+{
+	"SDKVersion": 2,
+	"Author": "Kiro",
+	"CodePath": "app.html",
+	"Description": "Kiro's inhouse toolkits for Stream Deck.",
+	"Name": "Microzone",
+	"Icon": "assets/images/microzone-icon",
+	"URL": "https://github.com/kiroeko/microzone",
+	"Version": "1.0.2",
+	"Software": {
+		"MinimumVersion": "5.0"
+	},
+	"OS": [
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Category": "Microzone",
+	"CategoryIcon": "assets/images/microzone-icon",
+	"Actions": [
+		{
+			"Icon": "assets/images/valorant-on",
+			"Name": "Valorant Assistant",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "assets/images/valorant-off"
+				}
+			],
+			"Tooltip": "Valorant assistant",
+			"UUID": "com.kiro.microzone.valorant-assistant",
+			"PropertyInspectorPath": ""
+		}
+	]
+}
