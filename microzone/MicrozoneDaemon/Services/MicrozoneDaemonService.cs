@@ -6,7 +6,6 @@ namespace MicrozoneDaemon
     {
         private readonly string statusRequest = "";
         private readonly string runtimePath = "";
-        private readonly string runtimeArguments = "";
         private readonly ILogger<MicrozoneDaemonService> logger;
 
         private readonly HttpClient httpClient = new HttpClient();
@@ -31,7 +30,6 @@ namespace MicrozoneDaemon
 
             statusRequest = configuration["MicrozoneCenter:StatusRequest"];
             runtimePath = configuration["MicrozoneCenter:RuntimePath"];
-            runtimeArguments = configuration["MicrozoneCenter:RuntimeArguments"];
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -83,7 +81,6 @@ namespace MicrozoneDaemon
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
                     FileName = runtimePath,
-                    Arguments = runtimeArguments,
                     CreateNoWindow = true,
                     RedirectStandardOutput = false,
                     UseShellExecute = false
