@@ -81,6 +81,7 @@ namespace MicrozoneDaemon
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
                     FileName = runtimePath,
+                    WorkingDirectory = Path.GetDirectoryName(runtimePath),
                     CreateNoWindow = true,
                     RedirectStandardOutput = false,
                     UseShellExecute = false
