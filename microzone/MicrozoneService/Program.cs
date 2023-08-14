@@ -5,8 +5,6 @@ using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://*:22333");
-
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
