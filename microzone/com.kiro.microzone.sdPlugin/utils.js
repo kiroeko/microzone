@@ -23,3 +23,29 @@ function ajaxGet(url, callback) {
         }
     }
 }
+
+function ajaxPost(url, data, callback) {
+    var formData = new FormData();
+    for (var i in data) {
+        formData.append(i, data[i]);
+    }
+    
+    var xhr = null;
+    if (XMLHttpRequest) {
+        xhr = new XMLHttpRequest();
+    } else {
+        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Access-Control-Allow-Origin", "*");   
+    xhr.setRequestHeader('Access-Control-Allow-Methods', '*');    
+    xhr.setRequestHeader('Access-Control-Allow-Headers', 'x-requested-with,content-type');  
+    xhr.send(formData);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            callback && callback(xhr.status, xhr.responseText);
+        }
+    }
+}
