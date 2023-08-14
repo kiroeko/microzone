@@ -4,33 +4,45 @@ namespace MicrozoneService
 {
     public class ValorantService : BackgroundService
     {
-        private readonly string processName = "";
-        private bool isValorantRunning = false;
+        public bool IsValorantRunning { get; private set; }
+        private readonly string[] targetProcessNames;
         private const int tickIntervalMS = 1000;
-
-        public bool IsValorantRunning => isValorantRunning;
 
         public ValorantService(IConfiguration configuration)
         {
-            processName = configuration["ValorantService:ProcessName"];
+            targetProcessNames = configuration.GetSection("ValorantService:ProcessNames").Get<string[]>();
         }
 
         public bool StopValorant()
         {
-            bool killedSuccessful = false;
-            Process? p = null;
-            try
+            bool killedSuccessful = true;
+            foreach (var processName in targetProcessNames)
             {
-                p = GetValorantProcess();
-                if (p != null && !p.HasExited)
+                Process[] ps = Process.GetProcessesByName(processName);
+                try
                 {
-                    p.Kill();
-                    killedSuccessful = true;
+                    foreach (Process p in ps)
+                    {
+                        if (p != null && !p.HasExited)
+                        {
+                            try
+                            {
+                                p.Kill();
+                            }
+                            catch
+                            {
+                                killedSuccessful = false;
+                            }
+                        }
+                    }
                 }
-            }
-            finally
-            {
-                p?.Dispose();
+                finally
+                {
+                    foreach (Process p in ps)
+                    {
+                        p?.Dispose();
+                    }
+                }
             }
 
             return killedSuccessful;
@@ -40,33 +52,47 @@ namespace MicrozoneService
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                Process? p = null;
                 try
                 {
-                    p = GetValorantProcess();
-                    bool currentIsValorantRunning = p != null && !p.HasExited;
-
-                    if (isValorantRunning != currentIsValorantRunning)
+                    bool isRunning = IfValorantRunning();
+                    if (IsValorantRunning != isRunning)
                     {
-                        if(currentIsValorantRunning)
+                        if (isRunning)
                             MouseUtil.SetAcceleration(0);
                         else
                             MouseUtil.SetAcceleration(1);
-                        isValorantRunning = currentIsValorantRunning;
+                        IsValorantRunning = isRunning;
                     }
                 }
-                finally
-                {
-                    p?.Dispose();
-                }
+                catch {}
 
                 await Task.Delay(tickIntervalMS, stoppingToken);
             }
         }
 
-        private Process? GetValorantProcess()
+        private bool IfValorantRunning()
         {
-            return Process.GetProcessesByName(processName).FirstOrDefault();
+            foreach (var processName in targetProcessNames)
+            {
+                Process[] ps = Process.GetProcessesByName(processName);
+                try
+                {
+                    foreach (Process p in ps)
+                    {
+                        if (p != null && !p.HasExited)
+                            return true;
+                    }
+                }
+                finally
+                {
+                    foreach (Process p in ps)
+                    {
+                        p?.Dispose();
+                    }
+                }
+            }
+
+            return false;
         }
     }
 
