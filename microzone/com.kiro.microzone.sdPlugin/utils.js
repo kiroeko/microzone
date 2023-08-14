@@ -12,7 +12,7 @@ async function imageToBase64(imagePath) {
 function ajaxGet(url, callback) {
     var ajax = new XMLHttpRequest();
     ajax.open("GET", url, true);
-    ajax.setRequestHeader("Access-Control-Allow-Origin","*");   
+    ajax.setRequestHeader("Access-Control-Allow-Origin", "*");   
     ajax.setRequestHeader('Access-Control-Allow-Methods', '*');    
     ajax.setRequestHeader('Access-Control-Allow-Headers', 'x-requested-with,content-type');  
     ajax.send(null);
